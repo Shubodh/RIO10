@@ -10,7 +10,7 @@ from matplotlib.ticker import FuncFormatter
 
 def get_gt():
     gt_size = 0
-    f_file = open('data/stats.txt', 'r')
+    f_file = open('../data/stats.txt', 'r')
     f_file.readline().rstrip().split()
     for line in f_file:
         if line.split('/')[0] in metadata["val"]:
@@ -32,7 +32,7 @@ def load_metadata(filename):
                 metadata['test'].append(test)
     return metadata
 
-metadata = load_metadata('data/metadata.json')
+metadata = load_metadata('../data/metadata.json')
 len_gt = get_gt()
 
 def print_table(config_json, methods_folder):
@@ -53,6 +53,8 @@ def print_table(config_json, methods_folder):
         DCRE_15 = (errors[:,2] < 0.15).sum() / len_gt
         pose_5 = np.logical_and((errors[:,1] < 5), (errors[:,0] < 0.05)).sum() / len_gt
         pose_outlier = np.logical_or((errors[:,1] >= 25), (errors[:,0] >= 0.5)).sum() / len_gt
+
+        print("Method name || pose_5 || (median x, y) || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
 
         print(config_json['methods'][file]['title'] + ' \t & ' +
               '{:.4}'.format(pose_5) + ' & ({:.4}'.format(np.median(errors[:,0])) + ', {:.4}'.format(np.median(errors[:,1])) + ')' +
@@ -105,7 +107,7 @@ def correlation_data(errors, methods, stats, stats_index, from_to_step, ax_limit
 def change_correlation(config_json, prediction_path):
     plt_utils.data_size = len_gt
     plot_config = config_json['change_corr']
-    stats, header = read_stats('data/stats.txt')
+    stats, header = read_stats('../data/stats.txt')
     errors = {}
     methods = get_methods(prediction_path, config_json['change_corr']['methods'])
     for method in methods:
