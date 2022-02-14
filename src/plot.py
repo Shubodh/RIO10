@@ -209,6 +209,7 @@ def get_methods(prediction_path, methods_list):
 
 
 if __name__ == "__main__":
+    # python plot.py --config ../config.json --data_path ../data/ --type 1
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, help='config file', default='./config.json')
     parser.add_argument('--data_path', type=str, help='data path of the depth maps', default='data')
