@@ -11,7 +11,7 @@ from matplotlib.ticker import FuncFormatter
 
 def get_gt():
     gt_size = 0
-    f_file = open('../data/stats.txt', 'r')
+    f_file = open('../data/stats_scene01.txt', 'r')
     f_file.readline().rstrip().split()
     for line in f_file:
         if line.split('/')[0] in metadata["val"]:
@@ -58,6 +58,7 @@ def print_table(config_json, methods_folder):
 
         pose_5 = np.logical_and((errors[:,1] < 5), (errors[:,0] < 0.05)).sum() / len_gt
         pose_500 = np.logical_and((errors[:,1] < 50), (errors[:,0] < 5.0)).sum() / len_gt
+        # pose_500 = np.logical_and((errors[:,1] < 30), (errors[:,0] < 3.0)).sum() / len_gt
         pose_outlier = np.logical_or((errors[:,1] >= 25), (errors[:,0] >= 0.5)).sum() / len_gt
 
         print("Method name || pose_500 || pose_5 || (median x, y) || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
@@ -65,7 +66,9 @@ def print_table(config_json, methods_folder):
         print(config_json['methods'][file]['title'] + ' \t & ' + '{:.4}'.format(pose_500) +
               ' & {:.4}'.format(pose_5) + ' & ({:.4}'.format(np.median(errors[:,0])) + ', {:.4}'.format(np.median(errors[:,1])) + ')' +
               ' & {:.3}'.format(DCRE_5) + ' & ' + '{:.3}'.format(DCRE_15) +
-              ' & {:.3}'.format(1 - len(errors) / len_gt) + ' & {:.3}'.format(pose_outlier) + ' & {:.3}'.format(DCRE_outlier) + '\\\\')
+              ' & {:.3}'.format(1 - len(errors) / len_gt) + 
+              ' & {:.3}'.format(pose_outlier) +
+               ' & {:.3}'.format(DCRE_outlier) + '\\\\')
         f_file.close()
 
 
