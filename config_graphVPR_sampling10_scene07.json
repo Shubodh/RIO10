@@ -16,15 +16,11 @@
          "title":"Active Search 100",
          "color":"#3985bd"
       },
-      "hloc_sample":{
-         "title":"hloc_sample",
+      "RIO_scene07_hloc_d2net_NN_mutual_skip10":{
+         "title":"RIO_scene07_hloc_d2net_NN_mutual_skip10",
          "color":"#003366"
       },
-      "HFNet_Trained":{
-         "title":"HFNet Trained",
-         "color":"#FF66B2"
-      },
-      "d2_net":{
+      "d2_net_sampling10_scene07":{
          "title":"D2Net",
          "color":"#fb891d"
       },
@@ -56,7 +52,7 @@
          "title":"Grove 100",
          "color":"#138D75"
       },
-      "grove_v2":{
+      "grove_v2_sampling10_scene07":{
          "title":"Grove V2",
          "color":"#138D75"
       },
@@ -92,11 +88,9 @@
    "change_corr":{
       "filename":"",
       "methods":[
-         "active_search",
-         "grove_v1",
-         "grove_v2",
-         "d2_net",
-         "hloc_sample"
+         "grove_v2_sampling10_scene07",
+         "d2_net_sampling10_scene07",
+         "RIO_scene07_hloc_d2net_NN_mutual_skip10"
       ],
       "stats_keys":[
          "SemanticChange",
@@ -177,11 +171,9 @@
    "overview":{
       "filename":"",
       "methods":[
-         "active_search",
-         "grove_v1",
-         "grove_v2",
-         "d2_net",
-         "hloc_sample"
+         "grove_v2_sampling10_scene07",
+         "d2_net_sampling10_scene07",
+         "RIO_scene07_hloc_d2net_NN_mutual_skip10"
       ],
       "bins":1000,
       "y_max":0.7,

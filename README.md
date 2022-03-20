@@ -1,5 +1,12 @@
 # RIO10 Documentation
 
+### Shubodh-Documentation-For-Evaluation
+
+1. First add your pose prediction file to data/predictions and rename it appropriately.
+2. Generate error file from prediction file: Use the script `evaluate.py` in parent folder or `./src/eval/build/eval_sampling10_scene0X data/ data/predictions/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt data/errors/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt`
+3. python plot_scene0X.py --data_path ../data/ --type 2 --config ../config_graphVPR_sampling10_scene09.json --scene_id 09
+3=. May need to refer to stats_xyz.txt in case something looks off.
+
 ### Dataset Overview
 
 In this work, we adapt [3RScan](https://waldjohannau.github.io/RIO) - a recently introduced indoor RGB-D dataset of changing indoor environments - to create [RIO10](https://waldjohannau.github.io/RIO10), a new long-term camera re-localization benchmark focused on indoor scenes. RIO10 consists of 74 sequences. We provide splits into training, validation (one sequence per scene) and testing sets, leaving us with 10 train, 10 validation and 54 test sequences overall, see corresponding [metadata.json](data/metadata.json).

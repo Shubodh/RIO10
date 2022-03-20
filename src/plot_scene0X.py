@@ -9,9 +9,9 @@ import plt_utils
 import matplotlib.pyplot as plt 
 from matplotlib.ticker import FuncFormatter
 
-def get_gt():
+def get_gt(scene_id):
     gt_size = 0
-    f_file = open('../data/stats_scene01.txt', 'r')
+    f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
     f_file.readline().rstrip().split()
     for line in f_file:
         if line.split('/')[0] in metadata["val"]:
@@ -34,9 +34,10 @@ def load_metadata(filename):
     return metadata
 
 metadata = load_metadata('../data/metadata.json')
-len_gt = get_gt()
 
-def print_table(config_json, methods_folder):
+def print_table(config_json, methods_folder, scene_id):
+    len_gt = get_gt(scene_id)
+
     methods_list = get_methods(methods_folder, config_json['overview']['methods'])
     methods = {}
 
@@ -113,10 +114,13 @@ def correlation_data(errors, methods, stats, stats_index, from_to_step, ax_limit
     return output 
 
 
-def change_correlation(config_json, prediction_path):
+def change_correlation(config_json, prediction_path, scene_id):
+    len_gt = get_gt(scene_id)
+
     plt_utils.data_size = len_gt
     plot_config = config_json['change_corr']
-    stats, header = read_stats('../data/stats.txt')
+    #stats, header = read_stats('../data/stats.txt') #'../data/stats_sampling10_scene' + scene_id + '.txt'
+    stats, header = read_stats('../data/stats_sampling10_scene' + scene_id + '.txt')
     errors = {}
     methods = get_methods(prediction_path, config_json['change_corr']['methods'])
     for method in methods:
@@ -148,7 +152,9 @@ def change_correlation(config_json, prediction_path):
     plt.show()
 
 
-def overview(config_json, histogram_folder):
+def overview(config_json, histogram_folder, scene_id):
+    len_gt = get_gt(scene_id)
+
     methods_list = get_methods(histogram_folder, config_json['overview']['methods'])
     plt_utils.data_size = len_gt
     kwargs = dict(histtype='step', alpha=0.9)
@@ -218,18 +224,29 @@ def get_methods(prediction_path, methods_list):
 
 
 if __name__ == "__main__":
-    # python plot.py --config ../config_graphVPR.json --data_path ../data/ --type 1
+    # INFO ABOUT THIS FILE: 
+    # 1. What inputs does it use?
+    # Ans: It basically uses stats_scene0X.txt (to find num of gt poses) and config_scene0X.json file to accumulate the errors.
+    # Therefore both of these files have been created scene specific.
+
+    # CURRENT STATUS:
+    # Clear about print_table() function for our results purpose, but have to look at overview() and correlation() functions
+
+    # python plot.py --config ../config_graphVPR.json --data_path ../data/ --type 2
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, help='config file', default='./config.json')
     parser.add_argument('--data_path', type=str, help='data path of the depth maps', default='data')
+    parser.add_argument('--scene_id', type=str, required=True) # example: 05
     parser.add_argument('--type', type=int, help='[1 = overview, 2 = latex-table, 3 = change correlation, 4 = all]', default=1)
 
     args = parser.parse_args()
     config_json = load_config(args.config)
     prediction_path = os.path.join(args.data_path, 'errors')
+
+    scene_id = args.scene_id
     if (args.type == 1):
-        overview(config_json, prediction_path)
+        overview(config_json, prediction_path, scene_id)
     elif (args.type == 2):
-        print_table(config_json, prediction_path)
+        print_table(config_json, prediction_path, scene_id)
     elif (args.type == 3):
-        change_correlation(config_json, prediction_path)
+        change_correlation(config_json, prediction_path, scene_id)
