@@ -2,10 +2,16 @@
 
 ### Shubodh-Documentation-For-Evaluation
 
-1. First add your pose prediction file to data/predictions and rename it appropriately.
-2. Generate error file from prediction file: Use the script `evaluate.py` in parent folder or `./src/eval/build/eval_sampling10_scene0X data/ data/predictions/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt data/errors/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt`
-3. python plot_scene0X.py --data_path ../data/ --type 2 --config ../config_graphVPR_sampling10_scene09.json --scene_id 09
+Use `bulk_run_full_eval_code.py` for running the below 3 steps in ONE GO!!!
+
+1. First add your pose prediction file to `data/predictions/<folder_name>` and rename it as one of `RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt` appropriately. Or use `bulk_copy_prediction_txt.py` for bulk copy.   
+2.0. First check if your GT depth img files are correct. You may have updated them but forgot to update it here locally.
+2. Generate error file from prediction file: Use the script `evaluate.py` (for bulk run) in parent folder or `./src/eval/build/eval_sampling10_scene0X data/ data/predictions/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt data/errors/RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt`
+3. (See bash_plot_scene0X.py for bulk) python plot_scene0X.py --data_path ../data/ --type 2 --config ../config_graphVPR_sampling10_scene09.json --scene_id 09
 3=. May need to refer to stats_xyz.txt in case something looks off.
+
+In case GT changes or other fundamental changes:
+0.1. Change commented out lines in CMakeLists.txt (#) and main.cpp (//) and then run make inside build folder to build new executable for new GT. Then use this executable in above 2. command.
 
 ### Dataset Overview
 

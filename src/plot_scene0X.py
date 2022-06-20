@@ -8,14 +8,18 @@ import sys
 import plt_utils
 import matplotlib.pyplot as plt 
 from matplotlib.ticker import FuncFormatter
+from pathlib import Path
 
 def get_gt(scene_id):
     gt_size = 0
     f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
+    # f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
     f_file.readline().rstrip().split()
     for line in f_file:
         if line.split('/')[0] in metadata["val"]:
             gt_size += 1
+    # print(gt_size)
+    # gt_size = 899
     return gt_size
 
 
@@ -35,12 +39,13 @@ def load_metadata(filename):
 
 metadata = load_metadata('../data/metadata.json')
 
-def print_table(config_json, methods_folder, scene_id):
+def print_table(config_json, methods_folder, scene_id, scene_type, dttime):
     len_gt = get_gt(scene_id)
 
     methods_list = get_methods(methods_folder, config_json['overview']['methods'])
     methods = {}
 
+    print("Note that writing results to /media/shubodh/DATA/OneDrive/rrc_projects/2021/graph-based-VPR/RIO10/data/results/")
 
     for file in methods_list:
         f_file = open(os.path.join(methods_folder, file + '.txt'), 'r')
@@ -58,18 +63,44 @@ def print_table(config_json, methods_folder, scene_id):
 
 
         pose_5 = np.logical_and((errors[:,1] < 5), (errors[:,0] < 0.05)).sum() / len_gt
-        pose_500 = np.logical_and((errors[:,1] < 50), (errors[:,0] < 5.0)).sum() / len_gt
+        pose_25 = np.logical_and((errors[:,1] < 10), (errors[:,0] < 0.25)).sum() / len_gt
+        pose_200 = np.logical_and((errors[:,1] < 10), (errors[:,0] < 2.0)).sum() / len_gt
+        #pose_500 = np.logical_and((errors[:,1] < 50), (errors[:,0] < 5.0)).sum() / len_gt
         # pose_500 = np.logical_and((errors[:,1] < 30), (errors[:,0] < 3.0)).sum() / len_gt
         pose_outlier = np.logical_or((errors[:,1] >= 25), (errors[:,0] >= 0.5)).sum() / len_gt
 
-        print("Method name || pose_500 || pose_5 || (median x, y) || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
+        print("Method name || pose_200 || pose_25 || pose_5 || (median x, y) || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
 
-        print(config_json['methods'][file]['title'] + ' \t & ' + '{:.4}'.format(pose_500) +
+        print(config_json['methods'][file]['title'] + ' \t & ' + '{:.4}'.format(pose_200) + ' & {:.4}'.format(pose_25) +
               ' & {:.4}'.format(pose_5) + ' & ({:.4}'.format(np.median(errors[:,0])) + ', {:.4}'.format(np.median(errors[:,1])) + ')' +
               ' & {:.3}'.format(DCRE_5) + ' & ' + '{:.3}'.format(DCRE_15) +
               ' & {:.3}'.format(1 - len(errors) / len_gt) + 
               ' & {:.3}'.format(pose_outlier) +
                ' & {:.3}'.format(DCRE_outlier) + '\\\\')
+        
+        # Write results to json
+        dict_to_json = {
+            "pose_200": '{:.4}'.format(pose_200),
+            "pose_25": '{:.4}'.format(pose_25),
+            "pose_5": '{:.4}'.format(pose_5),
+            "median": ('{:.4}'.format(np.median(errors[:,0])), '{:.4}'.format(np.median(errors[:,1]))),
+            "DCRE_5": '{:.3}'.format(DCRE_5),
+            "DCRE_15": '{:.3}'.format(DCRE_15),
+            "1 - len(errors) / len_gt": '{:.3}'.format(1 - len(errors) / len_gt), 
+            "pose_outlier": '{:.3}'.format(pose_outlier), 
+            "DCRE_outlier": '{:.3}'.format(DCRE_outlier)
+        }
+
+        json_object = json.dumps(dict_to_json, indent = 4)
+  
+        base_path = "/media/shubodh/DATA/OneDrive/rrc_projects/2021/graph-based-VPR/RIO10/data/results/" + scene_type + "/"
+        Path(base_path).mkdir(parents=True, exist_ok=True)
+        output_file_name = base_path + file + "_" +  "results_" + scene_type + "_scene" + scene_id + "_" + dttime  + ".json"
+        with open(output_file_name, "w") as outfile:
+            outfile.write(json_object)
+            # print(f"written results file to {output_file_name}")
+
+
         f_file.close()
 
 
@@ -233,20 +264,28 @@ if __name__ == "__main__":
     # Clear about print_table() function for our results purpose, but have to look at overview() and correlation() functions
 
     # python plot.py --config ../config_graphVPR.json --data_path ../data/ --type 2
+    scene_types =["ROI_with_QOI" , "RRI_with_QRI" , "RRI_with_QOI" , "ROI_with_QRI"] # ["ROI_and_ARRI_with_QRI", "RRI_and_ARRI_with_QRI", "ROI_and_ARRI_with_QOI"]  #more: ROI_with_QOI, RRI_with_QRI,
+    scene_types_aug_ref = ["ROI_and_ARRI_with_QRI", "RRI_and_ARRI_with_QRI","ROI_and_ARRI_with_QOI", "RRI_and_ARRI_with_QOI"]
+    scene_types_aug_query = ["ROI_with_QOI_and_AQRI", "ROI_and_ARRI_with_QOI_and_AQRI", "RRI_with_QRI_and_AQRI", "RRI_and_ARRI_with_QRI_and_AQRI"]
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, help='config file', default='./config.json')
     parser.add_argument('--data_path', type=str, help='data path of the depth maps', default='data')
     parser.add_argument('--scene_id', type=str, required=True) # example: 05
-    parser.add_argument('--type', type=int, help='[1 = overview, 2 = latex-table, 3 = change correlation, 4 = all]', default=1)
+    parser.add_argument('--scene_type', type=str, required=True) # example: ROI_with_QOI
+    parser.add_argument('--dttime', type=str, required=True) # dt030622-t1910
+    parser.add_argument('--type', type=int, help='[1 = overview, 2 = latex-table, 3 = change correlation, 4 = all]', default=2)
 
     args = parser.parse_args()
     config_json = load_config(args.config)
     prediction_path = os.path.join(args.data_path, 'errors')
 
     scene_id = args.scene_id
+    scene_type = args.scene_type
+    dttime = args.dttime
     if (args.type == 1):
         overview(config_json, prediction_path, scene_id)
     elif (args.type == 2):
-        print_table(config_json, prediction_path, scene_id)
+        print_table(config_json, prediction_path, scene_id, scene_type, dttime)
     elif (args.type == 3):
         change_correlation(config_json, prediction_path, scene_id)
