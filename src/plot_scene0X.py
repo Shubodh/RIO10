@@ -10,16 +10,33 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from pathlib import Path
 
-def get_gt(scene_id):
-    gt_size = 0
-    f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
-    # f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
-    f_file.readline().rstrip().split()
-    for line in f_file:
-        if line.split('/')[0] in metadata["val"]:
-            gt_size += 1
-    # print(gt_size)
-    # gt_size = 899
+def get_gt(scene_id, augmented_query_bool):
+    if augmented_query_bool:
+        if scene_id == "01":
+            gt_size = 1891
+        elif scene_id == "03":
+            gt_size = 1723
+        elif scene_id == "05":
+            gt_size = 1691
+        elif scene_id == "07":
+            gt_size = 2456 
+        elif scene_id == "09":
+            gt_size = 2961 
+        else:
+            print("wrong scene_id given, check")
+            sys.exit()
+    
+    else:
+        gt_size = 0
+        f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
+        # f_file = open('../data/stats_sampling10_scene' + scene_id + '.txt', 'r')
+        f_file.readline().rstrip().split()
+        for line in f_file:
+            if line.split('/')[0] in metadata["val"]:
+                gt_size += 1
+
+        # print(gt_size)
+        # gt_size = 899
     return gt_size
 
 
@@ -39,8 +56,8 @@ def load_metadata(filename):
 
 metadata = load_metadata('../data/metadata.json')
 
-def print_table(config_json, methods_folder, scene_id, scene_type, dttime):
-    len_gt = get_gt(scene_id)
+def print_table(augmented_query,config_json, methods_folder, scene_id, scene_type, dttime):
+    len_gt = get_gt(scene_id, augmented_query)
 
     methods_list = get_methods(methods_folder, config_json['overview']['methods'])
     methods = {}
@@ -275,10 +292,13 @@ if __name__ == "__main__":
     parser.add_argument('--scene_type', type=str, required=True) # example: ROI_with_QOI
     parser.add_argument('--dttime', type=str, required=True) # dt030622-t1910
     parser.add_argument('--type', type=int, help='[1 = overview, 2 = latex-table, 3 = change correlation, 4 = all]', default=2)
+    parser.add_argument('--augmented_query', choices=('True', 'False'), required=True)
 
     args = parser.parse_args()
     config_json = load_config(args.config)
     prediction_path = os.path.join(args.data_path, 'errors')
+
+    augmented_query = args.augmented_query == 'True'
 
     scene_id = args.scene_id
     scene_type = args.scene_type
@@ -286,6 +306,6 @@ if __name__ == "__main__":
     if (args.type == 1):
         overview(config_json, prediction_path, scene_id)
     elif (args.type == 2):
-        print_table(config_json, prediction_path, scene_id, scene_type, dttime)
+        print_table(augmented_query, config_json, prediction_path, scene_id, scene_type, dttime)
     elif (args.type == 3):
         change_correlation(config_json, prediction_path, scene_id)

@@ -151,7 +151,7 @@ public:
         const std::string& output_filename) {
         LoadPoses(poses_GT, datapath+"/GT_RIO10.txt");
         // LoadPoses(poses_GT, datapath+"/GT_RIO10_allscenes/GT_RIO10_sampling10_scene10.txt");
-        // LoadPoses(poses_GT, datapath+"/GT_RIO10_allscenes/GT_RIO10_sampling10_scene07_queryAND.txt");
+        // LoadPoses(poses_GT, datapath+"/GT_RIO10_allscenes/GT_RIO10_sampling10_scene09_queryAND.txt");
         LoadPoses(poses_predicted, prediction);
         std::cout << "#ground truth: " << poses_GT.size() << ", #predictions: " << poses_predicted.size() << std::endl;
         LoadIntrinsics(datapath +"/intrinsics.txt");

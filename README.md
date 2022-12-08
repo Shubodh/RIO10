@@ -2,7 +2,7 @@
 
 ### Shubodh-Documentation-For-Evaluation
 
-Use `bulk_run_full_eval_code.py` for running the below 3 steps in ONE GO!!!
+Use `bulk_run_full_eval_code.py` for running the below 3 steps in ONE GO!!! Then use `results_average_across_scenes.py` to compute average accuracy across all 5 scenes!
 
 1. First add your pose prediction file to `data/predictions/<folder_name>` and rename it as one of `RIO_scene0X_hloc_d2net_NN_mutual_skip10.txt` appropriately. Or use `bulk_copy_prediction_txt.py` for bulk copy.   
 2.0. First check if your GT depth img files are correct. You may have updated them but forgot to update it here locally.
@@ -11,7 +11,7 @@ Use `bulk_run_full_eval_code.py` for running the below 3 steps in ONE GO!!!
 3=. May need to refer to stats_xyz.txt in case something looks off.
 
 In case GT changes or other fundamental changes:
-0.1. Change commented out lines in CMakeLists.txt (#) and main.cpp (//) and then run make inside build folder to build new executable for new GT. Then use this executable in above 2. command.
+0.1. Change commented out lines in CMakeLists.txt (#) and main.cpp (//) and then run `make` inside build folder to build new executable for new GT. Then use this executable in above 2. command. ALSO depth images for evaluation: You need to update your depth images at location for example `/media/shubodh/DATA/OneDrive/rrc_projects/2021/graph-based-VPR/RIO10/data/seq01/seq01_02/places-0254-000146.rendered.depth.png`. ALSO you need to update hardcoded values of `gt_size` in get_gt() func in `plot_scene0X.py` file.
 
 ### Dataset Overview
 
