@@ -5,6 +5,8 @@ import json
 import numpy as np
 
 
+
+
 def main(method_type):
     # Date <> testing info
     #gt_radius_NETVLAD = "False" #dttime = "dt180622-t1511"
@@ -16,12 +18,12 @@ def main(method_type):
     scene_types_aug_all = scene_types_aug_ref + scene_types_aug_query
 
     # TODO: SET ALL THE BELOW, properly check.
-    dttime = "dt141222-t1210"; type_test = "normal"
-    # dttime = "dt081222-t0239"; type_test = "normal"
+    # dttime = "dt141222-t1210"; type_test = "normal" # For ["QRI_with_QOI"] 
+    # dttime = "dt081222-t0239"; type_test = "normal" # For ["AQRI_with_QOI"]
     # dttime = "dt061222-t2155"; type_test = "normal"
     # dttime = "dt230622-t2112"; type_test = "o40andgt40"
     # dttime = "dt100623-t2201"; type_test = "none_but_nvlad80"
-    # dttime = "dt100622-t0201"; type_test = "normal"
+    dttime = "dt100622-t0201"; type_test = "normal"
     # dttime = "dt180622-t1511"; type_test = "gt_radius_NETVLAD"
     # dttime = "dt200622-t1021"; type_test = "o20andr20"
     # dttime = "dt210622-t1907"; type_test = "o40andr40"
@@ -34,8 +36,8 @@ def main(method_type):
     # scene_types_current = [scene_types[0],  scene_types_aug_ref[2]]
     #scene_types_current = [scene_types_aug_ref[2],scene_types_aug_ref[3]]#, scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
     # scene_types_current = [scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
-    # scene_types_current = [scene_types[0]]#,scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
-    scene_types_current = ["QRI_with_QOI"] # ["AQRI_with_QOI"]
+    scene_types_current = [scene_types_aug_ref[2]]#, scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
+    # scene_types_current = ["QRI_with_QOI"] # ["AQRI_with_QOI"]
     print_individual =  False
     # TODO: SET ALL THE ABOVE, properly check.
 
@@ -72,16 +74,23 @@ def main(method_type):
             with open(output_file_name, 'r') as openfile:
                 json_object = json.load(openfile)
                 iter_i += 1
+
+                # try:
+                    # score_web = json_object['score']
+                # except KeyError:
+                score_web = 1 + float(json_object['DCRE_5']) - float(json_object['DCRE_outlier'])
+                score_web = str(score_web)
+
                 if print_individual:
                     print(scene_type, "room_id: ", room_id)
                     print('pose_200,   pose_25,   pose_5', 'DCRE_5', 'DCRE_15', 'score')
-                    print(json_object['pose_200'], "   ", json_object['pose_25'], "   ", json_object['pose_5'], "   ", json_object['DCRE_5'], "   ", json_object['DCRE_15'], "   ", json_object['score'])
+                    print(json_object['pose_200'], "   ", json_object['pose_25'], "   ", json_object['pose_5'], "   ", json_object['DCRE_5'], "   ", json_object['DCRE_15'], "   ", score_web)
                 av_pose_200.append(json_object['pose_200'])
                 av_pose_25.append(json_object['pose_25'])
                 av_pose_5.append(json_object['pose_5'])
                 av_DCRE_5.append(json_object['DCRE_5'])
                 av_DCRE_15.append(json_object['DCRE_15'])
-                av_score.append(json_object['score'])
+                av_score.append(score_web)
                 # print(iter_i)
     
         print("\n")
