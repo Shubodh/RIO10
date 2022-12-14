@@ -5,7 +5,7 @@ import json
 import numpy as np
 
 
-if __name__ == '__main__':
+def main(method_type):
     # Date <> testing info
     #gt_radius_NETVLAD = "False" #dttime = "dt180622-t1511"
     #o20andr20 = "True" #dt200622-t1021
@@ -16,7 +16,8 @@ if __name__ == '__main__':
     scene_types_aug_all = scene_types_aug_ref + scene_types_aug_query
 
     # TODO: SET ALL THE BELOW, properly check.
-    dttime = "dt081222-t0239"; type_test = "normal"
+    dttime = "dt141222-t1210"; type_test = "normal"
+    # dttime = "dt081222-t0239"; type_test = "normal"
     # dttime = "dt061222-t2155"; type_test = "normal"
     # dttime = "dt230622-t2112"; type_test = "o40andgt40"
     # dttime = "dt100623-t2201"; type_test = "none_but_nvlad80"
@@ -34,8 +35,8 @@ if __name__ == '__main__':
     #scene_types_current = [scene_types_aug_ref[2],scene_types_aug_ref[3]]#, scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
     # scene_types_current = [scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
     # scene_types_current = [scene_types[0]]#,scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
-    scene_types_current = ["AQRI_with_QOI"]#,scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
-    print_individual =  True
+    scene_types_current = ["QRI_with_QOI"] # ["AQRI_with_QOI"]
+    print_individual =  False
     # TODO: SET ALL THE ABOVE, properly check.
 
 
@@ -44,34 +45,67 @@ if __name__ == '__main__':
         av_pose_200 = []
         av_pose_25 = []
         av_pose_5 = []
+        av_DCRE_5 = []
+        av_DCRE_15 = []
+        av_score = []
+
         if print_individual:
             print("\n")
             print("1. INDIVIDUAL RESULTS")
             print(f"  SCENE TYPE: {scene_type}")
         for room_id in room_ids:
             base_path = "/media/shubodh/DATA/OneDrive/rrc_projects/2021/graph-based-VPR/RIO10/data/results/" + scene_type + "/"
-            file_prefix = "RIO_scene0" + room_id + "_hloc_d2net_NN_mutual_skip10"
-            output_file_name = base_path + file_prefix + "_" +  "results_" + scene_type + "_scene0" + room_id + "_" + dttime  + ".json"
+            # json_file_prefix = "RIO_scene0" + room_id + "_hloc_d2net_NN_mutual_skip10"
+            
+            if method_type == "MINE":
+                json_file_prefix = "RIO_scene0" + room_id + "_hloc_d2net_NN_mutual_skip10"
+            elif method_type == "d2net":
+                json_file_prefix = "d2_net_sampling10_scene0" + room_id
+            elif method_type == "grove_v2":
+                json_file_prefix = "grove_v2_sampling10_scene0" + room_id
+            else:
+                raise ValueError("method_type not recognized")
+
+
+            output_file_name = base_path + json_file_prefix + "_" +  "results_" + scene_type + "_scene0" + room_id + "_" + dttime  + ".json"
             assert Path(output_file_name).exists(), Path(output_file_name)
             with open(output_file_name, 'r') as openfile:
                 json_object = json.load(openfile)
                 iter_i += 1
                 if print_individual:
                     print(scene_type, "room_id: ", room_id)
-                    print('pose_200,   pose_25,   pose_5')
-                    print(json_object['pose_200'], "   ", json_object['pose_25'], "   ", json_object['pose_5'])
+                    print('pose_200,   pose_25,   pose_5', 'DCRE_5', 'DCRE_15', 'score')
+                    print(json_object['pose_200'], "   ", json_object['pose_25'], "   ", json_object['pose_5'], "   ", json_object['DCRE_5'], "   ", json_object['DCRE_15'], "   ", json_object['score'])
                 av_pose_200.append(json_object['pose_200'])
                 av_pose_25.append(json_object['pose_25'])
                 av_pose_5.append(json_object['pose_5'])
+                av_DCRE_5.append(json_object['DCRE_5'])
+                av_DCRE_15.append(json_object['DCRE_15'])
+                av_score.append(json_object['score'])
                 # print(iter_i)
     
         print("\n")
-        print("2. COMBINED AVERAGE RESULTS")
+        print("2. COMBINED AVERAGE RESULTS across scenes")
         print(f"  SCENE TYPE: {scene_type}")
         av_pose_200 = np.asarray(av_pose_200, dtype=float)
         av_pose_25 = np.asarray(av_pose_25, dtype=float)
         av_pose_5 = np.asarray(av_pose_5, dtype=float)
-        print('pose_200, pose_25, pose_5 AVERAGED')
-        print('{:.3}'.format(np.average(av_pose_200)), ",", '{:.3}'.format(np.average(av_pose_25)), ",", '{:.3}'.format(np.average(av_pose_5)))
+        av_DCRE_5 = np.asarray(av_DCRE_5, dtype=float)
+        av_DCRE_15 = np.asarray(av_DCRE_15, dtype=float)
+        av_score = np.asarray(av_score, dtype=float)
+        print('pose_200, pose_25, pose_5, DCRE_5, DCRE_15, score AVERAGED')
+        print('{:.3}'.format(np.average(av_pose_200)), ",", '{:.3}'.format(np.average(av_pose_25)), ",", '{:.3}'.format(np.average(av_pose_5)), ",", '{:.3}'.format(np.average(av_DCRE_5)), ",", '{:.3}'.format(np.average(av_DCRE_15)), ",", '{:.3}'.format(np.average(av_score)))
         print(dttime,type_test) 
 
+
+if __name__ == '__main__':
+    all_method_types = ["MINE", "d2net", "grove_v2"]
+
+    for method_type in all_method_types:
+        print(f"\n ### WHICH METHOD: {method_type} ###")
+        main(method_type)
+
+
+    # grove_v2_sampling10_scene09_results_AQRI_with_QOI_scene09_dt081222-t0239.json
+    # RIO_scene01_hloc_d2net_NN_mutual_skip10_results_AQRI_with_QOI_scene01_dt081222-t0239.json
+    # d2_net_sampling10_scene01_results_AQRI_with_QOI_scene01_dt081222-t0239.json

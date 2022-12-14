@@ -77,6 +77,8 @@ def print_table(augmented_query,config_json, methods_folder, scene_id, scene_typ
         DCRE_outlier = (errors[:,2] >= 0.5).sum() / len_gt
         DCRE_5 = (errors[:,2] < 0.05).sum() / len_gt
         DCRE_15 = (errors[:,2] < 0.15).sum() / len_gt
+        
+        score_web = 1 + DCRE_5 - DCRE_outlier # The score given on website: http://vmnavab26.in.tum.de/RIO10/benchmarks.php. I'm assuming by "outlier" on website, they mean DCRE_outlier and not pose_outlier. Seems obvious.
 
 
         pose_5 = np.logical_and((errors[:,1] < 5), (errors[:,0] < 0.05)).sum() / len_gt
@@ -86,11 +88,11 @@ def print_table(augmented_query,config_json, methods_folder, scene_id, scene_typ
         # pose_500 = np.logical_and((errors[:,1] < 30), (errors[:,0] < 3.0)).sum() / len_gt
         pose_outlier = np.logical_or((errors[:,1] >= 25), (errors[:,0] >= 0.5)).sum() / len_gt
 
-        print("Method name || pose_200 || pose_25 || pose_5 || (median x, y) || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
+        print("Method name || pose_200 || pose_25 || pose_5 || (median x, y) || Score || DCRE_5 || DCRE_15 || (1-len(errors)/len_gt) ||pose_outlier  || DCRE_outlier")
 
         print(config_json['methods'][file]['title'] + ' \t & ' + '{:.4}'.format(pose_200) + ' & {:.4}'.format(pose_25) +
               ' & {:.4}'.format(pose_5) + ' & ({:.4}'.format(np.median(errors[:,0])) + ', {:.4}'.format(np.median(errors[:,1])) + ')' +
-              ' & {:.3}'.format(DCRE_5) + ' & ' + '{:.3}'.format(DCRE_15) +
+              ' & {:.3}'.format(score_web) + ' & ' + ' & {:.3}'.format(DCRE_5) + ' & ' + '{:.3}'.format(DCRE_15) +
               ' & {:.3}'.format(1 - len(errors) / len_gt) + 
               ' & {:.3}'.format(pose_outlier) +
                ' & {:.3}'.format(DCRE_outlier) + '\\\\')
@@ -101,6 +103,7 @@ def print_table(augmented_query,config_json, methods_folder, scene_id, scene_typ
             "pose_25": '{:.4}'.format(pose_25),
             "pose_5": '{:.4}'.format(pose_5),
             "median": ('{:.4}'.format(np.median(errors[:,0])), '{:.4}'.format(np.median(errors[:,1]))),
+            "score": '{:.3}'.format(score_web),
             "DCRE_5": '{:.3}'.format(DCRE_5),
             "DCRE_15": '{:.3}'.format(DCRE_15),
             "1 - len(errors) / len_gt": '{:.3}'.format(1 - len(errors) / len_gt), 

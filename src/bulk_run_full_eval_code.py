@@ -18,7 +18,8 @@ if __name__ == '__main__':
     debug_print = str(args.debug_print) # Set False if you actually want code to run
 
     # TODO: SET ALL THE BELOW, properly check.
-    dttime = "dt081222-t0239"
+    dttime = "dt141222-t1210"
+    # dttime = "dt081222-t0239"
     # dttime = "dt061222-t2155"
     #dttime = "dt130622-t0402"
     # dttime = "dt100622-t0201"
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 
     # scene_types_current = [scene_types_aug_query[0],scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
     # scene_types_current = [scene_types[0]]#,scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
-    scene_types_current = ["AQRI_with_QOI"]#,scene_types_aug_query[1],scene_types_aug_query[2], scene_types_aug_query[3]]
+    scene_types_current = ["QRI_with_QOI"] # ["AQRI_with_QOI"]
 
     # scene_types_current = [scene_types_aug_ref[2]]
     augmented_query = "False"
